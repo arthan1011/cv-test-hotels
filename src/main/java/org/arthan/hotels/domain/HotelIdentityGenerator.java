@@ -19,7 +19,7 @@ public class HotelIdentityGenerator extends IdentityGenerator {
             long max = stream.map(e -> e.substring(2))
                     .mapToLong(Long::parseLong)
                     .max().orElse(0L);
-            return String.format("HO%010d", max);
+            return String.format("HO%010d", max + 1);
         }
         return super.generate(session, obj);
     }

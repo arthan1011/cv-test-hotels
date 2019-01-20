@@ -1,5 +1,11 @@
 package org.arthan.hotels.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import org.arthan.hotels.domain.entity.HOTEL_SERVICE;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class HotelDTO {
 
     private String id;
@@ -7,6 +13,10 @@ public class HotelDTO {
     private String catid;
     private String addr;
     private String img;
+    private SiteDTO site;
+    private List<HOTEL_SERVICE> services;
+
+    private List<Double> point;
 
     public String getId() {
         return id;
@@ -46,5 +56,33 @@ public class HotelDTO {
 
     public void setImg(String img) {
         this.img = img;
+    }
+
+    public List<Double> getPoint() {
+        return point;
+    }
+
+    public void setPoint(List<Double> point) {
+        this.point = point;
+    }
+
+    public SiteDTO getSite() {
+        return site;
+    }
+
+    public void setSite(SiteDTO site) {
+        this.site = site;
+    }
+
+    @JsonGetter
+    public List<String> getServices() {
+        if (services == null) {
+            return null;
+        }
+        return services.stream().map(s -> s.name().toLowerCase()).collect(Collectors.toList());
+    }
+
+    public void setServices(List<HOTEL_SERVICE> services) {
+        this.services = services;
     }
 }

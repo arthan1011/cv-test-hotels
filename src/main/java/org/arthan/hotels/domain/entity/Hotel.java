@@ -29,4 +29,19 @@ public class Hotel implements Identifiable {
     @Column(name = "img")
     public String image;
 
+    @Column(name = "first_coordinate")
+    public Double firstCoordinate;
+
+    @Column(name = "second_coordinate")
+    public Double secondCoordinate;
+
+    @Column(name = "site_label")
+    public String siteLabel;
+
+    @Column(name = "site_url")
+    public String siteUrl;
+
+    @Column
+    public String services;
+
 }
