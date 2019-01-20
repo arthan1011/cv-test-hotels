@@ -35,4 +35,9 @@ public class HotelResource {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping(value = "/{hotelId}")
+    void deleteHotel(@PathVariable("hotelId") String id) {
+        hotelService.removeHotel(id);
+    }
 }

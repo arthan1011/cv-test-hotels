@@ -113,4 +113,64 @@ public class HotelResourceTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("point[1]", Matchers.is(secondCoordinate)));
 
     }
+
+    @Test
+    public void shouldDeleteHotel() throws Exception {
+        Gson gson = new Gson();
+
+        JsonObject newHotelJson = new JsonObject();
+        String name = "King Richard Hotel";
+        String catalogId = "RC154963ZZ";
+        String image = "/b3247259d5dd4989a55b326edebef7e78323b79cc19daf15e23edc8552.jpg";
+        String address = "155-159 Golders Blue Rd, London NW11 9BX";
+        newHotelJson.addProperty("name", name);
+        newHotelJson.addProperty("catid", catalogId);
+        newHotelJson.addProperty("img", image);
+        newHotelJson.addProperty("addr", address);
+
+        JsonArray coordinates = new JsonArray();
+        double firstCoordinate = 51.575276d;
+        double secondCoordinate = -0.204098d;
+        coordinates.add(firstCoordinate);
+        coordinates.add(secondCoordinate);
+        newHotelJson.add("point", coordinates);
+
+        JsonObject site = new JsonObject();
+        String siteLabel = "www.kingrichardhotel.com";
+        String siteUrl = "http://www.kingrichardhotel.com/";
+        site.addProperty("label", siteLabel);
+        site.addProperty("url", siteUrl);
+        newHotelJson.add("site", site);
+
+        JsonArray services = new JsonArray();
+        String firstService = "restaurant";
+        String secondService = "fitness";
+        services.add(firstService);
+        services.add(secondService);
+        newHotelJson.add("services", services);
+
+        MockHttpServletRequestBuilder saveRequest = MockMvcRequestBuilders.post("/api/hotel")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(gson.toJson(newHotelJson));
+
+        MvcResult saveResult = mockMvc.perform(saveRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String hotelId = saveResult.getResponse().getContentAsString();
+
+        MockHttpServletRequestBuilder getRequest = MockMvcRequestBuilders.get("/api/hotel/" + hotelId)
+                .accept(MediaType.APPLICATION_JSON_VALUE);
+
+        mockMvc.perform(getRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("catid", Matchers.is(catalogId)));
+
+        MockHttpServletRequestBuilder deleteRequest = MockMvcRequestBuilders.delete("/api/hotel/" + hotelId);
+
+        mockMvc.perform(deleteRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        mockMvc.perform(getRequest)
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
 }

@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class HotelService {
@@ -77,5 +76,9 @@ public class HotelService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public void removeHotel(String hotelId) {
+        hotelRepository.deleteById(hotelId);
     }
 }
