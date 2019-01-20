@@ -128,27 +128,6 @@ public class HotelResourceTest {
         newHotelJson.addProperty("img", image);
         newHotelJson.addProperty("addr", address);
 
-        JsonArray coordinates = new JsonArray();
-        double firstCoordinate = 51.575276d;
-        double secondCoordinate = -0.204098d;
-        coordinates.add(firstCoordinate);
-        coordinates.add(secondCoordinate);
-        newHotelJson.add("point", coordinates);
-
-        JsonObject site = new JsonObject();
-        String siteLabel = "www.kingrichardhotel.com";
-        String siteUrl = "http://www.kingrichardhotel.com/";
-        site.addProperty("label", siteLabel);
-        site.addProperty("url", siteUrl);
-        newHotelJson.add("site", site);
-
-        JsonArray services = new JsonArray();
-        String firstService = "restaurant";
-        String secondService = "fitness";
-        services.add(firstService);
-        services.add(secondService);
-        newHotelJson.add("services", services);
-
         MockHttpServletRequestBuilder saveRequest = MockMvcRequestBuilders.post("/api/hotel")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(gson.toJson(newHotelJson));
@@ -163,6 +142,7 @@ public class HotelResourceTest {
 
         mockMvc.perform(getRequest)
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(Matchers.notNullValue()))
                 .andExpect(MockMvcResultMatchers.jsonPath("catid", Matchers.is(catalogId)));
 
         MockHttpServletRequestBuilder deleteRequest = MockMvcRequestBuilders.delete("/api/hotel/" + hotelId);
@@ -172,5 +152,63 @@ public class HotelResourceTest {
 
         mockMvc.perform(getRequest)
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    public void shouldUpdateHotel() throws Exception {
+        Gson gson = new Gson();
+
+        JsonObject hotelJson = new JsonObject();
+        String name = "King Saladin Hotel";
+        String catalogId = "SC154963ZZ";
+        String image = "/b3247259d5dd4989a55b3eee28323b79cc19daf15e23edc8552.jpg";
+        String address = "155-159 Golders Blue Rd, Dublin NW11 9BX";
+        hotelJson.addProperty("name", name);
+        hotelJson.addProperty("catid", catalogId);
+        hotelJson.addProperty("img", image);
+        hotelJson.addProperty("addr", address);
+
+        MockHttpServletRequestBuilder saveRequest = MockMvcRequestBuilders.post("/api/hotel")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(gson.toJson(hotelJson));
+
+        MvcResult saveResult = mockMvc.perform(saveRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String hotelId = saveResult.getResponse().getContentAsString();
+
+        MockHttpServletRequestBuilder getRequest = MockMvcRequestBuilders.get("/api/hotel/" + hotelId)
+                .accept(MediaType.APPLICATION_JSON_VALUE);
+
+        mockMvc.perform(getRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("catid", Matchers.is(catalogId)))
+                .andExpect(MockMvcResultMatchers.jsonPath("name", Matchers.is(name)))
+                .andExpect(MockMvcResultMatchers.jsonPath("addr", Matchers.is(address)))
+                .andExpect(MockMvcResultMatchers.jsonPath("img", Matchers.is(image)));
+
+        JsonObject newHotelJson = new JsonObject();
+        String newName = "Sultan Saladin Hotel";
+        String newCatalogId = "SS154963ZZ";
+        String newImage = "/bdd4989a55b3eee28323b79cc19daf15e23edc8552.jpg";
+        String newAddress = "155-159 Golders Blue Rd, Washington NW11 9BX";
+        newHotelJson.addProperty("name", newName);
+        newHotelJson.addProperty("catid", newCatalogId);
+        newHotelJson.addProperty("img", newImage);
+        newHotelJson.addProperty("addr", newAddress);
+
+        MockHttpServletRequestBuilder putRequest = MockMvcRequestBuilders.put("/api/hotel/" + hotelId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(gson.toJson(newHotelJson));
+
+        mockMvc.perform(putRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        mockMvc.perform(getRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("catid", Matchers.is(newCatalogId)))
+                .andExpect(MockMvcResultMatchers.jsonPath("name", Matchers.is(newName)))
+                .andExpect(MockMvcResultMatchers.jsonPath("addr", Matchers.is(newAddress)))
+                .andExpect(MockMvcResultMatchers.jsonPath("img", Matchers.is(newImage)));
     }
 }

@@ -40,4 +40,9 @@ public class HotelResource {
     void deleteHotel(@PathVariable("hotelId") String id) {
         hotelService.removeHotel(id);
     }
+
+    @PutMapping(value = "/{hotelId}")
+    void updateHotel(@PathVariable("hotelId") String id, @RequestBody HotelDTO data) {
+        hotelService.updateHotel(id, data);
+    }
 }

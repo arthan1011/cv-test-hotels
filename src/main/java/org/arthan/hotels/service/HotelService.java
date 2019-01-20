@@ -26,17 +26,7 @@ public class HotelService {
 
     public String addHotel(HotelDTO newHotel) {
 
-        Hotel hotelEntity = new Hotel();
-
-        hotelEntity.address = newHotel.getAddr();
-        hotelEntity.image = newHotel.getImg();
-        hotelEntity.catalogId = newHotel.getCatid();
-        hotelEntity.name = newHotel.getName();
-        hotelEntity.firstCoordinate = newHotel.getPoint().get(0);
-        hotelEntity.secondCoordinate = newHotel.getPoint().get(1);
-        hotelEntity.siteLabel = newHotel.getSite() != null ? newHotel.getSite().getLabel() : null;
-        hotelEntity.siteUrl = newHotel.getSite() != null ?newHotel.getSite().getUrl() : null;
-        hotelEntity.services = newHotel.getServices() != null ? String.join(",", newHotel.getServices()) : null;
+        Hotel hotelEntity = toHotelEntity(newHotel);
 
         Hotel savedHotel = hotelRepository.save(hotelEntity);
 
@@ -66,11 +56,13 @@ public class HotelService {
             siteDTO.setUrl(foundHotel.siteUrl);
             result.setSite(siteDTO);
 
-            List<HOTEL_SERVICE> serviceList = Arrays.stream(foundHotel.services.split(","))
-                    .map(String::toUpperCase)
-                    .map(HOTEL_SERVICE::valueOf)
-                    .collect(Collectors.toList());
-            result.setServices(serviceList);
+            if (foundHotel.services != null) {
+                List<HOTEL_SERVICE> serviceList = Arrays.stream(foundHotel.services.split(","))
+                        .map(String::toUpperCase)
+                        .map(HOTEL_SERVICE::valueOf)
+                        .collect(Collectors.toList());
+                result.setServices(serviceList);
+            }
 
             return Optional.of(result);
         } else {
@@ -80,5 +72,27 @@ public class HotelService {
 
     public void removeHotel(String hotelId) {
         hotelRepository.deleteById(hotelId);
+    }
+
+    public void updateHotel(String hotelId, HotelDTO data) {
+        Hotel hotelEntity = toHotelEntity(data);
+        hotelEntity.id = hotelId;
+
+        hotelRepository.save(hotelEntity);
+    }
+
+    private Hotel toHotelEntity(HotelDTO newHotel) {
+        Hotel hotelEntity = new Hotel();
+
+        hotelEntity.address = newHotel.getAddr();
+        hotelEntity.image = newHotel.getImg();
+        hotelEntity.catalogId = newHotel.getCatid();
+        hotelEntity.name = newHotel.getName();
+        hotelEntity.firstCoordinate = newHotel.getPoint() != null ? newHotel.getPoint().get(0) : null;
+        hotelEntity.secondCoordinate = newHotel.getPoint() != null ? newHotel.getPoint().get(1) : null;
+        hotelEntity.siteLabel = newHotel.getSite() != null ? newHotel.getSite().getLabel() : null;
+        hotelEntity.siteUrl = newHotel.getSite() != null ?newHotel.getSite().getUrl() : null;
+        hotelEntity.services = newHotel.getServices() != null ? String.join(",", newHotel.getServices()) : null;
+        return hotelEntity;
     }
 }
